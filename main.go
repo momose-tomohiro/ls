@@ -6,6 +6,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/user"
+	"strconv"
+	"syscall"
 )
 
 func main() {
@@ -24,14 +27,29 @@ func main() {
 	}
 
 	if *lFlag {
-		fmt.Println("total", len(fileInfos))
+		fmt.Println("合計", len(fileInfos))
 		for _, fileInfo := range fileInfos {
 
 			fmt.Printf("%v", fileInfo.Mode())
 
 			fmt.Printf(" %v", fileInfo.Size())
 
-			fmt.Printf(" %v", os.Getgid())
+			if stat, ok := fileInfo.Sys().(*syscall.Stat_t); ok {
+				uid := strconv.Itoa(int(stat.Uid))
+				u, err := user.LookupId(uid)
+				if err != nil {
+					fmt.Printf(uid)
+				} else {
+					fmt.Printf(u.Username)
+				}
+				gid := strconv.Itoa(int(stat.Gid))
+				g, err := user.LookupGroupId(gid)
+				if err != nil {
+					fmt.Printf(gid)
+				} else {
+					fmt.Printf(g.Name)
+				}
+			}
 
 			fmt.Printf(" %v ", fileInfo.ModTime().Format("Jan 2 15:04"))
 
