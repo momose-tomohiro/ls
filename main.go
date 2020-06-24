@@ -14,6 +14,7 @@ import (
 func main() {
 
 	var lFlag = flag.Bool("l", false, "File Attribute")
+	var rFlag = flag.Bool("r", false, "sort reverse")
 	flag.Parse()
 
 	dir, err := os.Getwd()
@@ -24,6 +25,17 @@ func main() {
 	fileInfos, err := ioutil.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if *rFlag {
+		length := len(fileInfos)
+
+		reverseFileInfos := []os.FileInfo{}
+		for i := length - 1; i >= 0; i-- {
+			reverseFileInfos = append(reverseFileInfos, fileInfos[i])
+		}
+
+		fileInfos = reverseFileInfos
 	}
 
 	if *lFlag {
@@ -38,16 +50,16 @@ func main() {
 				uid := strconv.Itoa(int(stat.Uid))
 				u, err := user.LookupId(uid)
 				if err != nil {
-					fmt.Printf(uid)
+					fmt.Printf(" %v", uid)
 				} else {
-					fmt.Printf(u.Username)
+					fmt.Printf(" %v", u.Username)
 				}
 				gid := strconv.Itoa(int(stat.Gid))
 				g, err := user.LookupGroupId(gid)
 				if err != nil {
-					fmt.Printf(gid)
+					fmt.Printf(" %v", gid)
 				} else {
-					fmt.Printf(g.Name)
+					fmt.Printf(" %v", g.Name)
 				}
 			}
 
